@@ -6,57 +6,40 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-$data = json_decode(file_get_contents("php://input"), true);
+$inputJSON = file_get_contents("php://input");
+$data = json_decode($inputJSON, true);
 
+// Validar datos recibidos
 if (!isset($data['mes_consolidacion'])) {
-    echo json_encode(["success" => false, "message" => "Datos incompletos"]);
+    echo json_encode(["success" => false, "message" => "Falta el mes de consolidación"]);
     exit();
 }
-
-$mes_consolidacion = $data['mes_consolidacion'];
 
 // Conectar a la base de datos
 $conn = getDatabaseConnection("carnesag_productos");
 
-// Verificar la última versión consolidada
-$sqlVersion = "SELECT COALESCE(MAX(version), 0) + 1 AS nueva_version 
-               FROM inventario_consolidado 
-               WHERE mes_consolidacion = ?";
-$stmtVersion = $conn->prepare($sqlVersion);
-$stmtVersion->bind_param("s", $mes_consolidacion);
-$stmtVersion->execute();
-$resultVersion = $stmtVersion->get_result();
-$nuevaVersion = $resultVersion->fetch_assoc()['nueva_version'];
+$mes_consolidacion = $conn->real_escape_string($data['mes_consolidacion']);
+$conn->begin_transaction();
 
-// Consolidar los datos agrupando por producto, incluyendo la categoría
-$sqlInsert = "INSERT INTO inventario_consolidado (
-                    existencia_id, 
-                    total_cajas, 
-                    total_kilos, 
-                    total_peso, 
-                    fecha_consolidacion, 
-                    mes_consolidacion, 
-                    version, 
-                    activo
-                )
-                SELECT 
-                    d.existencia_id, 
-                    SUM(d.cantidad_cajas), 
-                    SUM(d.cantidad_kilos), 
-                    SUM(d.peso_cajas), 
-                    NOW(), ?, ?, ?, TRUE 
-                FROM inventario_detalle d
-                JOIN EXISTENCIA e ON d.existencia_id = e.ID_EXISTENCIA
-                JOIN CATEGORIA c ON e.CATEGORIA_ID_CATEGORIA = c.ID_CATEGORIA
-                GROUP BY d.existencia_id";
+try {
+    // Consolidar datos agrupados por `existencia_id`
+    $sql = "INSERT INTO inventario_consolidado (existencia_id, total_cajas, total_kilos, total_peso, usuario, mes_consolidacion)
+            SELECT existencia_id, SUM(cantidad_cajas), SUM(cantidad_kilos), SUM(peso_cajas), usuario, '$mes_consolidacion'
+            FROM inventario_temporal
+            GROUP BY existencia_id, usuario
+            ON DUPLICATE KEY UPDATE 
+                total_cajas = VALUES(total_cajas), 
+                total_kilos = VALUES(total_kilos), 
+                total_peso = VALUES(total_peso);";
 
-$stmtInsert = $conn->prepare($sqlInsert);
-$stmtInsert->bind_param("ssi", $mes_consolidacion, $nuevaVersion);
+    $conn->query($sql);
 
-if ($stmtInsert->execute()) {
+    // Vaciar la tabla `inventario_temporal`
+    $conn->query("DELETE FROM inventario_temporal");
+
+    $conn->commit();
     echo json_encode(["success" => true, "message" => "Inventario consolidado con éxito"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Error en la consolidación"]);
+} catch (Exception $e) {
+    $conn->rollback();
+    echo json_encode(["success" => false, "message" => "Error en la consolidación: " . $e->getMessage()]);
 }
-
-$conn->close();
