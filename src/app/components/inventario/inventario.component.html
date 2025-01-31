@@ -1,0 +1,76 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Gestión de Inventario</h2>
+
+    <!-- Formulario de Ingreso -->
+    <div class="card p-4">
+        <div class="row g-3">
+            <!-- Buscador de productos con autocompletado -->
+            <div class="col-md-6">
+                <label for="producto" class="form-label">Producto</label>
+                <input type="text" id="producto" class="form-control" [(ngModel)]="productoSeleccionado"
+                    (input)="filtrarProductos()" placeholder="Buscar producto...">
+                <ul class="list-group mt-2" *ngIf="productosFiltrados.length">
+                    <li class="list-group-item list-group-item-action" *ngFor="let producto of productosFiltrados"
+                        (click)="seleccionarProducto(producto)">
+                        {{ producto.nombre }}
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Cantidades -->
+            <div class="col-md-2">
+                <label for="cajas" class="form-label">Cajas</label>
+                <input type="number" id="cajas" class="form-control" [(ngModel)]="cantidadCajas">
+            </div>
+
+            <div class="col-md-2">
+                <label for="kilos" class="form-label">Kilos</label>
+                <input type="number" id="kilos" class="form-control" [(ngModel)]="cantidadKilos">
+            </div>
+
+            <div class="col-md-2">
+                <label for="peso" class="form-label">Peso Cajas</label>
+                <input type="number" id="peso" class="form-control" [(ngModel)]="pesoCajas">
+            </div>
+
+            <div class="col-md-12 text-center mt-3">
+                <button class="btn btn-primary" (click)="agregarProducto()">Agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de productos ingresados -->
+    <div class="mt-4">
+        <h4>Productos Ingresados</h4>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th> <!-- NUEVA COLUMNA -->
+                    <th>Cajas</th>
+                    <th>Kilos</th>
+                    <th>Peso Cajas</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of listaInventario">
+                    <td>{{ item.nombre }}</td> <!-- Mostrar el nombre del producto -->
+                    <td>{{ item.categoria_nombre }}</td> <!-- NUEVA COLUMNA -->
+                    <td>{{ item.cantidad_cajas }}</td>
+                    <td>{{ item.cantidad_kilos }}</td>
+                    <td>{{ item.peso_cajas }}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" (click)="eliminarProducto(item)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón para Cargar a Base de Datos -->
+    <div class="text-center mt-4">
+        <button class="btn btn-success" (click)="cargarBaseDatos()">Cargar a Base de Datos</button>
+    </div>
+
+</div>

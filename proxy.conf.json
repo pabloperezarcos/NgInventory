@@ -1,0 +1,8 @@
+{
+    "/api": {
+        "target": "https://carnesag.cl/nginventory",
+        "secure": false,
+        "changeOrigin": true,
+        "logLevel": "debug"
+    }
+}
