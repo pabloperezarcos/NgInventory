@@ -1,0 +1,39 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Inventario Temporal</h2>
+
+    <table class="table table-bordered table-striped" *ngIf="inventarioTemporal.length">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Cajas</th>
+                <th>Kilos</th>
+                <th>Peso Cajas</th>
+                <th>Usuario</th>
+                <th>Fecha Ingreso</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of inventarioTemporal">
+                <td>{{ item.id }}</td>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.categoria_nombre }}</td>
+                <td>{{ item.cantidad_cajas }}</td>
+                <td>{{ item.cantidad_kilos }}</td>
+                <td>{{ item.peso_cajas }}</td>
+                <td>{{ item.usuario }}</td>
+                <td>{{ item.fecha_ingreso }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p *ngIf="!inventarioTemporal.length" class="text-center text-muted">
+        No hay productos en el inventario temporal.
+    </p>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success" (click)="confirmarConsolidacion()">Consolidar Inventario</button>
+    </div>
+
+</div>
