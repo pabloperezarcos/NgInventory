@@ -11,6 +11,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/inventario/inventario.component').then(c => c.InventarioComponent),
         data: { showNavbar: false, showFooter: false }
     },
+    {
+        path: 'consolidar-inventario',
+        loadComponent: () => import('./components/consolidar-inventario/consolidar-inventario.component').then(c => c.ConsolidarInventarioComponent),
+        data: { showNavbar: false, showFooter: false }
+    }
 
 
 ];
