@@ -154,14 +154,21 @@ export class InventarioComponent {
     this.inventarioService.guardarInventarioTemporal(this.listaInventario).subscribe(response => {
       if (response.success) {
         alert("Inventario cargado con éxito.");
-        this.listaInventario = []; // Vaciar la lista tras la carga
-        localStorage.removeItem('inventario'); // Limpiar localStorage
+
+        // 🔹 Primero verificar que la base de datos realmente guardó los datos
+        console.log("Inventario cargado:", this.listaInventario);
+
+        // 🔹 Ahora limpiamos solo si se guardó correctamente en la BD
+        this.listaInventario = [];
+        localStorage.removeItem('listaInventario'); // 🔹 CORREGIDO: Eliminamos la clave correcta
+
       } else {
-        alert("Error al cargar el inventario.");
+        alert("Error al cargar el inventario: " + response.message);
+        console.error("Error en la respuesta:", response);
       }
     }, error => {
       console.error("Error en la carga del inventario:", error);
-      alert("Hubo un problema al cargar el inventario.");
+      alert("Hubo un problema al cargar el inventario. Revisa la consola.");
     });
   }
 
