@@ -8,9 +8,9 @@ import { InventarioConsolidado } from '../models/inventario-consolidado';
   providedIn: 'root'
 })
 export class InventarioService {
-  private apiUrlDetalle = 'https://www.carnesag.cl/nginventory/api/inventario-detalle.php';
-  private apiUrlConsolidado = 'https://www.carnesag.cl/nginventory/api/inventario-consolidado.php';
-  private apiUrlTemporal = 'https://www.carnesag.cl/nginventory/api/cargar_inventario_temporal.php'; // Corregido
+  private apiUrlTemporal = 'https://www.carnesag.cl/nginventory/api/obtener_inventario_temporal.php';
+  private apiUrlDetalle = 'https://www.carnesag.cl/nginventory/api/cargar_inventario_detalle.php';
+  private apiUrlConsolidado = 'https://www.carnesag.cl/nginventory/api/consolidar_inventario.php';
 
   constructor(private http: HttpClient) { }
 
@@ -24,13 +24,31 @@ export class InventarioService {
     return this.http.post<{ success: boolean, data: InventarioDetalle }>(this.apiUrlDetalle, inventario);
   }
 
-  // Consolidar el inventario
-  consolidarInventario(mes: string): Observable<{ success: boolean, data: InventarioConsolidado[] }> {
-    return this.http.post<{ success: boolean, data: InventarioConsolidado[] }>(this.apiUrlConsolidado, { mes });
+  // Obtener los registros del inventario temporal
+  getInventarioTemporal(): Observable<{ success: boolean; data: InventarioDetalle[] }> {
+    return this.http.get<{ success: boolean; data: InventarioDetalle[] }>(
+      'https://www.carnesag.cl/nginventory/api/obtener_inventario_temporal.php'
+    );
+  }
+
+  // Guardar datos en inventario_detalle
+  cargarInventarioDetalle(inventario: InventarioDetalle[]): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(this.apiUrlDetalle, { inventario });
+  }
+
+  // Consolidar inventario
+  consolidarInventario(mesConsolidacion: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(this.apiUrlConsolidado, { mes_consolidacion: mesConsolidacion });
   }
 
   // Guardar inventario temporal
-  guardarInventarioTemporal(inventario: InventarioDetalle[]): Observable<{ success: boolean, message: string }> {
-    return this.http.post<{ success: boolean, message: string }>(this.apiUrlTemporal, { inventario });
+  guardarInventarioTemporal(inventario: InventarioDetalle[]): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      'https://www.carnesag.cl/nginventory/api/cargar_inventario_temporal.php',
+      { inventario }
+    );
   }
+
+
+
 }
