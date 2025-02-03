@@ -12,6 +12,7 @@ export class InventarioService {
   private apiUrlDetalle = 'https://www.carnesag.cl/nginventory/api/cargar_inventario_detalle.php';
   private apiUrlConsolidado = 'https://www.carnesag.cl/nginventory/api/consolidar_inventario.php';
 
+
   constructor(private http: HttpClient) { }
 
   // Obtener registros de inventario detalle
@@ -48,7 +49,5 @@ export class InventarioService {
       { inventario }
     );
   }
-
-
 
 }
