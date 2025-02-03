@@ -1,0 +1,41 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Consulta de Inventario</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="tablaSeleccionada">Seleccionar Tabla</label>
+            <select id="tablaSeleccionada" class="form-control" [(ngModel)]="tablaSeleccionada">
+                <option value="detalle">Inventario Detalle</option>
+                <option value="consolidado">Inventario Consolidado</option>
+            </select>
+        </div>
+        <div class="col-md-6 text-center align-self-end">
+            <button class="btn btn-primary" (click)="consultarInventario()">Consultar</button>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Cajas</th>
+                <th>Peso Cajas</th>
+                <th>Kilos</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of inventario">
+                <td>{{ item.producto_nombre | titlecase }}</td>
+                <td>{{ item.categoria_nombre | titlecase }}</td>
+                <td>{{ item.cantidad_cajas || item.total_cajas }}</td>
+                <td>{{ item.peso_cajas || item.total_peso }}</td>
+                <td>{{ item.cantidad_kilos || item.total_kilos }}</td>
+                <td>{{ item.usuario }}</td>
+                <td>{{ item.fecha_ingreso || item.fecha_consolidacion }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
